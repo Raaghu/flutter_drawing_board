@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Let\'s Draw',
+      title: 'Logic\'s Interactive Display',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: false),
       debugShowCheckedModeBanner: false,
       home: const DrawingPage(),

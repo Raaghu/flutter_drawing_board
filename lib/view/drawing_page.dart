@@ -1,10 +1,12 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart' hide Image;
+import 'package:flutter/widgets.dart' as widgets;
 import 'package:flutter_drawing_board/main.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/drawing_canvas.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/drawing_mode.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/sketch.dart';
+import 'package:flutter_drawing_board/view/drawing_canvas/widgets/canvas_bottom_bar.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/widgets/canvas_side_bar.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -28,7 +30,7 @@ class DrawingPage extends HookWidget {
 
     final animationController = useAnimationController(
       duration: const Duration(milliseconds: 150),
-      initialValue: 1,
+      initialValue: 0,
     );
     return Scaffold(
       body: Stack(
@@ -75,6 +77,23 @@ class DrawingPage extends HookWidget {
               ),
             ),
           ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            // left: -5,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 1),
+                end: Offset.zero,
+              ).animate(animationController),
+              child: Center(
+                child: CanvasBottomBar(
+                  drawingMode: drawingMode,
+                ),
+              ),
+            ),
+          ),
           _CustomAppBar(animationController: animationController),
         ],
       ),
@@ -108,13 +127,8 @@ class _CustomAppBar extends StatelessWidget {
               },
               icon: const Icon(Icons.menu),
             ),
-            const Text(
-              'Let\'s Draw',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 19,
-              ),
-            ),
+            widgets.Image.network(
+                "https://www.logicav.in/wp-content/uploads/elementor/thumbs/cropped-logo-1-q5kr9ju2xelwolprlkd4mfl82tmmxoll2flnhrg2li.png"),
             const SizedBox.shrink(),
           ],
         ),

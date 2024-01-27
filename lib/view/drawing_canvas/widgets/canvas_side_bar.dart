@@ -8,12 +8,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_drawing_board/main.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/drawing_mode.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/sketch.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/widgets/color_palette.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:url_launcher/url_launcher.dart';
@@ -54,8 +52,8 @@ class CanvasSideBar extends HookWidget {
     );
     final scrollController = useScrollController();
     return Container(
-      width: 300,
-      height: MediaQuery.of(context).size.height < 680 ? 450 : 610,
+      width: 200,
+      height: MediaQuery.of(context).size.height - 120,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
@@ -75,68 +73,12 @@ class CanvasSideBar extends HookWidget {
           padding: const EdgeInsets.all(10.0),
           controller: scrollController,
           children: [
-            const SizedBox(height: 10),
             const Text(
-              'Shapes',
+              'Shapes Tools',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const Divider(),
-            Wrap(
-              alignment: WrapAlignment.start,
-              spacing: 5,
-              runSpacing: 5,
-              children: [
-                _IconBox(
-                  iconData: FontAwesomeIcons.pencil,
-                  selected: drawingMode.value == DrawingMode.pencil,
-                  onTap: () => drawingMode.value = DrawingMode.pencil,
-                  tooltip: 'Pencil',
-                ),
-                _IconBox(
-                  selected: drawingMode.value == DrawingMode.line,
-                  onTap: () => drawingMode.value = DrawingMode.line,
-                  tooltip: 'Line',
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 22,
-                        height: 2,
-                        color: drawingMode.value == DrawingMode.line
-                            ? Colors.grey[900]
-                            : Colors.grey,
-                      ),
-                    ],
-                  ),
-                ),
-                _IconBox(
-                  iconData: Icons.hexagon_outlined,
-                  selected: drawingMode.value == DrawingMode.polygon,
-                  onTap: () => drawingMode.value = DrawingMode.polygon,
-                  tooltip: 'Polygon',
-                ),
-                _IconBox(
-                  iconData: FontAwesomeIcons.eraser,
-                  selected: drawingMode.value == DrawingMode.eraser,
-                  onTap: () => drawingMode.value = DrawingMode.eraser,
-                  tooltip: 'Eraser',
-                ),
-                _IconBox(
-                  iconData: FontAwesomeIcons.square,
-                  selected: drawingMode.value == DrawingMode.square,
-                  onTap: () => drawingMode.value = DrawingMode.square,
-                  tooltip: 'Square',
-                ),
-                _IconBox(
-                  iconData: FontAwesomeIcons.circle,
-                  selected: drawingMode.value == DrawingMode.circle,
-                  onTap: () => drawingMode.value = DrawingMode.circle,
-                  tooltip: 'Circle',
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
+            Column(
               children: [
                 const Text(
                   'Fill Shape: ',
@@ -154,7 +96,7 @@ class CanvasSideBar extends HookWidget {
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 150),
               child: drawingMode.value == DrawingMode.polygon
-                  ? Row(
+                  ? Column(
                       children: [
                         const Text(
                           'Polygon Sides: ',
@@ -189,7 +131,7 @@ class CanvasSideBar extends HookWidget {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const Divider(),
-            Row(
+            Column(
               children: [
                 const Text(
                   'Stroke Size: ',
@@ -205,7 +147,7 @@ class CanvasSideBar extends HookWidget {
                 ),
               ],
             ),
-            Row(
+            Column(
               children: [
                 const Text(
                   'Eraser Size: ',
@@ -249,24 +191,6 @@ class CanvasSideBar extends HookWidget {
                   child: const Text('Clear'),
                   onPressed: () => undoRedoStack.value.clear(),
                 ),
-                TextButton(
-                  onPressed: () async {
-                    if (backgroundImage.value != null) {
-                      backgroundImage.value = null;
-                    } else {
-                      backgroundImage.value = await _getImage;
-                    }
-                  },
-                  child: Text(
-                    backgroundImage.value == null
-                        ? 'Add Background'
-                        : 'Remove Background',
-                  ),
-                ),
-                TextButton(
-                  child: const Text('Fork on Github'),
-                  onPressed: () => _launchUrl(kGithubRepo),
-                ),
               ],
             ),
             const SizedBox(height: 20),
@@ -275,7 +199,7 @@ class CanvasSideBar extends HookWidget {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const Divider(),
-            Row(
+            Column(
               children: [
                 SizedBox(
                   width: 140,
@@ -301,7 +225,7 @@ class CanvasSideBar extends HookWidget {
             ),
             // add about me button or follow buttons
             const Divider(),
-            Center(
+            /* Center(
               child: GestureDetector(
                 onTap: () => _launchUrl('https://github.com/JideGuru'),
                 child: const Text(
@@ -309,7 +233,7 @@ class CanvasSideBar extends HookWidget {
                   style: TextStyle(fontSize: 12),
                 ),
               ),
-            ),
+            ),*/
           ],
         ),
       ),
