@@ -110,6 +110,9 @@ class DrawingCanvas extends HookWidget {
       drawingMode.value,
       filled.value,
     );
+    if(drawingMode.value == DrawingMode.search){
+      _onSearch();
+    }
   }
 
   Widget buildAllSketches(BuildContext context) {
@@ -160,6 +163,10 @@ class DrawingCanvas extends HookWidget {
         },
       ),
     );
+  }
+
+  void _onSearch(){
+    allSketches.value.removeLast();
   }
 }
 
@@ -247,7 +254,18 @@ class SketchPainter extends CustomPainter {
         );
       } else if (sketch.type == SketchType.line) {
         canvas.drawLine(firstPoint, lastPoint, paint);
-      } else if (sketch.type == SketchType.circle) {
+      } else if(sketch.type == SketchType.arrow){
+        _drawArrow(firstPoint, lastPoint, canvas, paint);
+      }else if(sketch.type == SketchType.search){
+        final borderPaint = Paint()
+          ..color = Colors.blue
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.0;
+        _drawDottedLine(canvas, rect.topLeft, rect.topRight, borderPaint);
+        _drawDottedLine(canvas, rect.topRight, rect.bottomRight, borderPaint);
+        _drawDottedLine(canvas, rect.bottomRight, rect.bottomLeft, borderPaint);
+        _drawDottedLine(canvas, rect.bottomLeft, rect.topLeft, borderPaint);
+      }else if (sketch.type == SketchType.circle) {
         canvas.drawOval(rect, paint);
         // Uncomment this line if you need a PERFECT CIRCLE
         // canvas.drawCircle(centerPoint, radius , paint);
@@ -279,5 +297,46 @@ class SketchPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant SketchPainter oldDelegate) {
     return oldDelegate.sketches != sketches;
+  }
+
+  void _drawArrow(Offset a, Offset b, Canvas canvas, Paint paint) {
+    const arrowSize = 10;
+    const arrowAngle = math.pi / 6;
+
+    final dX = b.dx - a.dx;
+    final dY = b.dy - a.dy;
+    final angle = math.atan2(dY, dX);
+
+    // Recalculate b such that it's the end of the line minus the arrow.
+    final Offset subtractedB = Offset(
+      b.dx - (arrowSize - 2) * math.cos(angle),
+      b.dy - (arrowSize - 2) * math.sin(angle),
+    );
+
+    canvas.drawLine(a, subtractedB, paint);
+    final path = Path();
+
+    path.moveTo(b.dx - arrowSize * math.cos(angle - arrowAngle),
+        b.dy - arrowSize * math.sin(angle - arrowAngle));
+    path.lineTo(b.dx, b.dy);
+    path.lineTo(b.dx - arrowSize * math.cos(angle + arrowAngle),
+        b.dy - arrowSize * math.sin(angle + arrowAngle));
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  void _drawDottedLine(Canvas canvas, Offset start, Offset end, Paint paint) {
+    const double dotSize = 1.0;
+    const double spaceSize = 2.0;
+    final double totalDistance = (end - start).distance;
+    final int dotCount = (totalDistance / (dotSize + spaceSize)).floor();
+
+    for (int i = 0; i < dotCount; i++) {
+      final double progress = i / dotCount;
+      final Offset? currentPoint = Offset.lerp(start, end, progress);
+      if (currentPoint != null) {
+        canvas.drawCircle(currentPoint, dotSize / 2, paint);
+      }
+    }
   }
 }

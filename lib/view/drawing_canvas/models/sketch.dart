@@ -28,6 +28,7 @@ class Sketch {
       color: sketch.color,
       size: sketch.size,
       filled: drawingMode == DrawingMode.line ||
+              drawingMode == DrawingMode.arrow ||
               drawingMode == DrawingMode.pencil ||
               drawingMode == DrawingMode.eraser
           ? false
@@ -40,12 +41,16 @@ class Sketch {
             return SketchType.scribble;
           case DrawingMode.line:
             return SketchType.line;
+          case DrawingMode.arrow:
+            return SketchType.arrow;
           case DrawingMode.square:
             return SketchType.square;
           case DrawingMode.circle:
             return SketchType.circle;
           case DrawingMode.polygon:
             return SketchType.polygon;
+          case DrawingMode.search:
+            return SketchType.search;
           default:
             return SketchType.scribble;
         }
@@ -79,7 +84,7 @@ class Sketch {
   }
 }
 
-enum SketchType { scribble, line, square, circle, polygon }
+enum SketchType { scribble, line, square, circle, polygon, arrow, search}
 
 extension SketchTypeX on SketchType {
   String toRegularString() => toString().split('.')[1];

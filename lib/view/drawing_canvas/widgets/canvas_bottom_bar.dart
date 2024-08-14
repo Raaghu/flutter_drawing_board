@@ -60,6 +60,12 @@ class CanvasBottomBar extends HookWidget {
               ),
             ),
             _IconBox(
+              iconData: Icons.arrow_right_alt,
+              selected: drawingMode.value == DrawingMode.arrow,
+              onTap: () => drawingMode.value = DrawingMode.arrow,
+              tooltip: 'Arrow',
+            ),
+            _IconBox(
               iconData: Icons.hexagon_outlined,
               selected: drawingMode.value == DrawingMode.polygon,
               onTap: () => drawingMode.value = DrawingMode.polygon,
@@ -81,6 +87,12 @@ class CanvasBottomBar extends HookWidget {
               iconData: FontAwesomeIcons.circle,
               selected: drawingMode.value == DrawingMode.circle,
               onTap: () => drawingMode.value = DrawingMode.circle,
+              tooltip: 'Circle',
+            ),
+            _IconBox(
+              iconData: Icons.search,
+              selected: drawingMode.value == DrawingMode.search,
+              onTap: () => drawingMode.value = DrawingMode.search,
               tooltip: 'Circle',
             ),
           ],
