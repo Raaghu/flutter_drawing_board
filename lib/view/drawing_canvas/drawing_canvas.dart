@@ -5,6 +5,7 @@ import 'package:flutter/material.dart' hide Image;
 import 'package:flutter_drawing_board/main.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/drawing_mode.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/sketch.dart';
+import 'package:flutter_drawing_board/view/drawing_canvas/widgets/popup.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 class DrawingCanvas extends HookWidget {
@@ -21,6 +22,7 @@ class DrawingCanvas extends HookWidget {
   final GlobalKey canvasGlobalKey;
   final ValueNotifier<int> polygonSides;
   final ValueNotifier<bool> filled;
+  final ValueNotifier<PopUpState?> popUp;
 
   const DrawingCanvas({
     Key? key,
@@ -37,6 +39,7 @@ class DrawingCanvas extends HookWidget {
     required this.filled,
     required this.polygonSides,
     required this.backgroundImage,
+    required this.popUp
   }) : super(key: key);
 
   @override
@@ -166,7 +169,11 @@ class DrawingCanvas extends HookWidget {
   }
 
   void _onSearch(){
-    allSketches.value.removeLast();
+    var selectedSketch = allSketches.value.removeLast();
+    var lastPointFromSearch = selectedSketch.points.removeLast();
+    double dx = lastPointFromSearch.dx;
+    double dy = lastPointFromSearch.dy;
+    popUp.value = PopUpState('https://google.com', dx, dy);
   }
 }
 

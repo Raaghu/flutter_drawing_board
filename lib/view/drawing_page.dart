@@ -8,6 +8,7 @@ import 'package:flutter_drawing_board/view/drawing_canvas/models/drawing_mode.da
 import 'package:flutter_drawing_board/view/drawing_canvas/models/sketch.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/widgets/canvas_bottom_bar.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/widgets/canvas_side_bar.dart';
+import 'package:flutter_drawing_board/view/drawing_canvas/widgets/popup.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 class DrawingPage extends HookWidget {
@@ -22,6 +23,7 @@ class DrawingPage extends HookWidget {
     final filled = useState<bool>(false);
     final polygonSides = useState<int>(3);
     final backgroundImage = useState<Image?>(null);
+    final popUp = useState<PopUpState?>(null);
 
     final canvasGlobalKey = GlobalKey();
 
@@ -53,6 +55,7 @@ class DrawingPage extends HookWidget {
               filled: filled,
               polygonSides: polygonSides,
               backgroundImage: backgroundImage,
+              popUp: popUp
             ),
           ),
           Positioned(
@@ -95,6 +98,8 @@ class DrawingPage extends HookWidget {
             ),
           ),
           _CustomAppBar(animationController: animationController),
+          if(popUp.value != null)
+            PopUp(popUp)
         ],
       ),
     );
