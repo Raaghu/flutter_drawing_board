@@ -8,7 +8,7 @@ import 'package:flutter_drawing_board/view/drawing_canvas/models/drawing_mode.da
 import 'package:flutter_drawing_board/view/drawing_canvas/models/sketch.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/widgets/canvas_bottom_bar.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/widgets/canvas_side_bar.dart';
-import 'package:flutter_drawing_board/view/drawing_canvas/widgets/popup.dart';
+import 'package:flutter_drawing_board/view/drawing_canvas/widgets/search.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 class DrawingPage extends HookWidget {
@@ -16,14 +16,14 @@ class DrawingPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final selectedColor = useState(Colors.black);
-    final strokeSize = useState<double>(10);
+    final selectedColor = useState(Colors.white);
+    final strokeSize = useState<double>(2);
     final eraserSize = useState<double>(30);
     final drawingMode = useState(DrawingMode.pencil);
     final filled = useState<bool>(false);
     final polygonSides = useState<int>(3);
     final backgroundImage = useState<Image?>(null);
-    final popUp = useState<PopUpState?>(null);
+    final popUp = useState<SearchState?>(null);
 
     final canvasGlobalKey = GlobalKey();
 
@@ -99,7 +99,7 @@ class DrawingPage extends HookWidget {
           ),
           _CustomAppBar(animationController: animationController),
           if(popUp.value != null)
-            PopUp(popUp)
+            Search(popUp, canvasGlobalKey)
         ],
       ),
     );
@@ -132,9 +132,9 @@ class _CustomAppBar extends StatelessWidget {
               },
               icon: const Icon(Icons.menu),
             ),
-            widgets.Image.network(
-                "https://www.logicav.in/wp-content/uploads/elementor/thumbs/cropped-logo-1-q5kr9ju2xelwolprlkd4mfl82tmmxoll2flnhrg2li.png"),
-            const SizedBox.shrink(),
+            const widgets.Image(
+                image: AssetImage('assets/logic.png'),height: 20,),
+            const SizedBox(width: 40,height: 40,),
           ],
         ),
       ),

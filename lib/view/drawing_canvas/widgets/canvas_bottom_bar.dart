@@ -16,7 +16,7 @@ class CanvasBottomBar extends HookWidget {
     final scrollController = useScrollController();
     return Container(
       height: MediaQuery.of(context).size.height < 680 ? 40 : 50,
-      decoration: BoxDecoration(
+      /*decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
         boxShadow: [
@@ -26,7 +26,7 @@ class CanvasBottomBar extends HookWidget {
             offset: const Offset(3, 3),
           ),
         ],
-      ),
+      ),*/
       child: Scrollbar(
         controller: scrollController,
         thumbVisibility: true,
@@ -53,7 +53,7 @@ class CanvasBottomBar extends HookWidget {
                     width: 22,
                     height: 2,
                     color: drawingMode.value == DrawingMode.line
-                        ? Colors.grey[900]
+                        ? const Color.fromARGB(255, 0, 238, 255)
                         : Colors.grey,
                   ),
                 ],
@@ -130,7 +130,7 @@ class _IconBox extends StatelessWidget {
           width: 35,
           decoration: BoxDecoration(
             border: Border.all(
-              color: selected ? Colors.grey[900]! : Colors.grey,
+              color: selected ?const Color.fromARGB(255, 0, 238, 255)! : Colors.grey,
               width: 1.5,
             ),
             borderRadius: const BorderRadius.all(Radius.circular(5)),
@@ -141,7 +141,7 @@ class _IconBox extends StatelessWidget {
             child: child ??
                 Icon(
                   iconData,
-                  color: selected ? Colors.grey[900] : Colors.grey,
+                  color: selected ? const Color.fromARGB(255, 0, 238, 255) : Colors.grey,
                   size: 20,
                 ),
           ),

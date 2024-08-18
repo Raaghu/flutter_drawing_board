@@ -3,19 +3,23 @@ import 'package:flutter_drawing_board/view/drawing_canvas/models/drawing_mode.da
 
 class Sketch {
   final List<Offset> points;
+  final List<int> pointStrokeTimes;
   final Color color;
   final double size;
   final SketchType type;
   final bool filled;
   final int sides;
+  final bool current;
 
   Sketch({
     required this.points,
+    required this.pointStrokeTimes,
     this.color = Colors.black,
     this.type = SketchType.scribble,
     this.filled = true,
     this.sides = 3,
     required this.size,
+    this.current = true,
   });
 
   factory Sketch.fromDrawingMode(
@@ -25,6 +29,7 @@ class Sketch {
   ) {
     return Sketch(
       points: sketch.points,
+      pointStrokeTimes: sketch.pointStrokeTimes,
       color: sketch.color,
       size: sketch.size,
       filled: drawingMode == DrawingMode.line ||
@@ -34,6 +39,7 @@ class Sketch {
           ? false
           : filled,
       sides: sketch.sides,
+      current: sketch.current,
       type: () {
         switch (drawingMode) {
           case DrawingMode.eraser:
@@ -58,10 +64,26 @@ class Sketch {
     );
   }
 
+  factory Sketch.save(
+    Sketch sketch,
+  ) {
+    return Sketch(
+      points: sketch.points,
+      pointStrokeTimes: sketch.pointStrokeTimes,
+      size: sketch.size,
+      color: sketch.color,
+      filled: sketch.filled,
+      sides: sketch.sides,
+      type: sketch.type,
+      current: false,
+    );
+  }
+
   Map<String, dynamic> toJson() {
     List<Map> pointsMap = points.map((e) => {'dx': e.dx, 'dy': e.dy}).toList();
     return {
       'points': pointsMap,
+      'pointStrokeTimes': pointStrokeTimes,
       'color': color.toHex(),
       'size': size,
       'filled': filled,
@@ -75,6 +97,7 @@ class Sketch {
         (json['points'] as List).map((e) => Offset(e['dx'], e['dy'])).toList();
     return Sketch(
       points: points,
+      pointStrokeTimes: json['pointStrokeTimes'],
       color: (json['color'] as String).toColor(),
       size: json['size'],
       filled: json['filled'],
@@ -84,7 +107,7 @@ class Sketch {
   }
 }
 
-enum SketchType { scribble, line, square, circle, polygon, arrow, search}
+enum SketchType { scribble, line, square, circle, polygon, arrow, search }
 
 extension SketchTypeX on SketchType {
   String toRegularString() => toString().split('.')[1];

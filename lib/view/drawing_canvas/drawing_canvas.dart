@@ -2,10 +2,11 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart' hide Image;
+import 'package:flutter/rendering.dart';
 import 'package:flutter_drawing_board/main.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/drawing_mode.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/sketch.dart';
-import 'package:flutter_drawing_board/view/drawing_canvas/widgets/popup.dart';
+import 'package:flutter_drawing_board/view/drawing_canvas/widgets/search.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 class DrawingCanvas extends HookWidget {
@@ -22,9 +23,11 @@ class DrawingCanvas extends HookWidget {
   final GlobalKey canvasGlobalKey;
   final ValueNotifier<int> polygonSides;
   final ValueNotifier<bool> filled;
-  final ValueNotifier<PopUpState?> popUp;
+  final ValueNotifier<SearchState?> popUp;
 
-  const DrawingCanvas({
+  final GlobalKey _globalKey = GlobalKey();
+
+  DrawingCanvas({
     Key? key,
     required this.height,
     required this.width,
@@ -61,6 +64,7 @@ class DrawingCanvas extends HookWidget {
     currentSketch.value = Sketch.fromDrawingMode(
       Sketch(
         points: [offset],
+        pointStrokeTimes: [DateTime.now().millisecondsSinceEpoch],
         size: drawingMode.value == DrawingMode.eraser
             ? eraserSize.value
             : strokeSize.value,
@@ -77,12 +81,22 @@ class DrawingCanvas extends HookWidget {
   void onPointerMove(PointerMoveEvent details, BuildContext context) {
     final box = context.findRenderObject() as RenderBox;
     final offset = box.globalToLocal(details.position);
-    final points = List<Offset>.from(currentSketch.value?.points ?? [])
+    var points = List<Offset>.from(currentSketch.value?.points ?? [])
       ..add(offset);
+
+    final currentTimeInMillis = DateTime.now().millisecondsSinceEpoch;
+    var pointStrokeTimes = List<int>.from(currentSketch.value?.pointStrokeTimes??[])
+      ..add(currentTimeInMillis);
+    
+    if(![DrawingMode.eraser, DrawingMode.pencil].contains(drawingMode.value) && points.length > 1){
+      points = [points.first, points.last];
+      pointStrokeTimes = [pointStrokeTimes.first, pointStrokeTimes.last];
+    }
 
     currentSketch.value = Sketch.fromDrawingMode(
       Sketch(
         points: points,
+        pointStrokeTimes: pointStrokeTimes,
         size: drawingMode.value == DrawingMode.eraser
             ? eraserSize.value
             : strokeSize.value,
@@ -98,10 +112,11 @@ class DrawingCanvas extends HookWidget {
 
   void onPointerUp(PointerUpEvent details) {
     allSketches.value = List<Sketch>.from(allSketches.value)
-      ..add(currentSketch.value!);
+      ..add(Sketch.save(currentSketch.value!));
     currentSketch.value = Sketch.fromDrawingMode(
       Sketch(
         points: [],
+        pointStrokeTimes: [],
         size: drawingMode.value == DrawingMode.eraser
             ? eraserSize.value
             : strokeSize.value,
@@ -169,11 +184,16 @@ class DrawingCanvas extends HookWidget {
   }
 
   void _onSearch(){
-    var selectedSketch = allSketches.value.removeLast();
-    var lastPointFromSearch = selectedSketch.points.removeLast();
-    double dx = lastPointFromSearch.dx;
-    double dy = lastPointFromSearch.dy;
-    popUp.value = PopUpState('https://google.com', dx, dy);
+    final selectedArea = allSketches.value.removeLast();
+    final firstPoint = selectedArea.points.first;
+    final lastPoint = selectedArea.points.last;
+
+    final List<Sketch> copyOfAllSketches = [];
+    for(final sketch in allSketches.value){
+      copyOfAllSketches.add(Sketch.fromJson(sketch.toJson()));
+    }
+
+    popUp.value = SearchState(firstPoint,lastPoint, copyOfAllSketches);
   }
 }
 
@@ -204,6 +224,7 @@ class SketchPainter extends CustomPainter {
     }
     for (Sketch sketch in sketches) {
       final points = sketch.points;
+
       if (points.isEmpty) return;
 
       final path = Path();

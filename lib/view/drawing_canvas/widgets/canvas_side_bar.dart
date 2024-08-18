@@ -54,16 +54,16 @@ class CanvasSideBar extends HookWidget {
     return Container(
       width: 200,
       height: MediaQuery.of(context).size.height - 120,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: const BorderRadius.horizontal(right: Radius.circular(10)),
-        boxShadow: [
+        /*boxShadow: [
           BoxShadow(
             color: Colors.grey.shade200,
             blurRadius: 3,
             offset: const Offset(3, 3),
           ),
-        ],
+        ],*/
       ),
       child: Scrollbar(
         controller: scrollController,

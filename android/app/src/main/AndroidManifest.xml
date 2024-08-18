@@ -2,7 +2,7 @@
     package="com.jideguru.flutter_drawing_board">
     <uses-permission android:name="android.permission.INTERNET" />
     <application
-        android:label="flutter_drawing_board"
+        android:label="Logic Note"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
