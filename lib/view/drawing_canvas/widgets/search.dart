@@ -53,15 +53,45 @@ class Search extends HookWidget {
       [],
     );
 
-    final dx = useState<double>(searchState.value?.point2.dx ?? 0);
-    final dy = useState<double>(searchState.value?.point2.dy ?? 0);
+    final position = useState<Offset>(Offset(
+        searchState.value?.point2.dx ?? 0, searchState.value?.point2.dy ?? 0));
 
     return Positioned(
-        left: dx.value,
-        top: dy.value,
+        left: position.value.dx,
+        top: position.value.dy,
         child: url.value == null
             ? Container()
-            : Draggable(
+            : Column(
+                children: [
+                  GestureDetector(
+                    onPanUpdate: (details) {
+                      position.value = position.value + details.delta;
+                    },
+                    child: Container(
+                      width: 300,
+                      height: 40,
+                      padding: const EdgeInsets.only(left: 5),
+                      decoration: const BoxDecoration(
+                          color: Color.fromARGB(255, 207, 207, 207)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Search'),
+                          IconButton(
+                              onPressed: () {
+                                searchState.value = null;
+                              },
+                              icon: const Icon(Icons.close))
+                        ],
+                      ),
+                    ),
+                  ),
+                  PopUpContent(url: url.value ?? 'https://google.com'),
+                ],
+              )
+
+        /*
+            Draggable(
                   feedback: PopUpContent(url.value ?? 'https://google.com', () {
                     searchState.value = null;
                   }),
@@ -73,7 +103,8 @@ class Search extends HookWidget {
                   child: PopUpContent(url.value ?? 'https://google.com', () {
                     searchState.value = null;
                   }),
-                ));
+                )*/
+        );
   }
 
   Future<HttpServer> startServer() async {
@@ -229,12 +260,21 @@ class Search extends HookWidget {
   }
 }
 
-class PopUpContent extends HookWidget {
+class PopUpContent extends StatefulWidget {
   final String url;
-  final VoidCallback onClose;
+
+  const PopUpContent({required this.url, super.key});
+ 
+  @override
+  State<PopUpContent> createState() => _PopUpContent();
+}
+
+class _PopUpContent extends State<PopUpContent> {
   late final WebViewController controller;
 
-  PopUpContent(this.url, this.onClose, {super.key}) {
+  @override
+  void initState() {
+    super.initState();
     controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(const Color(0x00000000))
@@ -255,7 +295,7 @@ class PopUpContent extends HookWidget {
           },
         ),
       )
-      ..loadRequest(Uri.parse(url));
+      ..loadRequest(Uri.parse(widget.url));
   }
 
   @override
@@ -267,27 +307,7 @@ class PopUpContent extends HookWidget {
           border: Border.all(
               width: 1, color: const Color.fromARGB(255, 207, 207, 207)),
           color: const Color.fromARGB(255, 255, 255, 255)),
-      child: Column(children: [
-        Container(
-          width: 300,
-          height: 40,
-          padding: const EdgeInsets.only(left: 5),
-          decoration:
-              const BoxDecoration(color: Color.fromARGB(255, 207, 207, 207)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Search'),
-              IconButton(onPressed: onClose, icon: const Icon(Icons.close))
-            ],
-          ),
-        ),
-        SizedBox(
-          width: 300,
-          height: 350,
-          child: WebViewWidget(controller: controller),
-        )
-      ]),
+      child: WebViewWidget(controller: controller),
     );
   }
 }

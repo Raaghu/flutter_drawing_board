@@ -87,6 +87,10 @@ class DrawingCanvas extends HookWidget {
     final currentTimeInMillis = DateTime.now().millisecondsSinceEpoch;
     var pointStrokeTimes = List<int>.from(currentSketch.value?.pointStrokeTimes??[])
       ..add(currentTimeInMillis);
+
+    if(drawingMode.value == DrawingMode.search){
+      popUp.value = null;
+    }
     
     if(![DrawingMode.eraser, DrawingMode.pencil].contains(drawingMode.value) && points.length > 1){
       points = [points.first, points.last];
