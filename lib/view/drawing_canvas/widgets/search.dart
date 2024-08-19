@@ -28,17 +28,30 @@ class Search extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final urlFuture = useState<Future<String>?>(null);
     final url = useState<String?>(null);
 
-    if (urlFuture.value == null) {
-      urlFuture.value = getUrl(context);
-      urlFuture.value!.then((generatedUrl) {
-        url.value = generatedUrl;
-      }).catchError((e){
-        searchState.value = null;
-      });
-    }
+    useEffect(
+      () {
+        HttpServer? localServer;
+        startServer().then((ls) {
+          localServer = ls;
+        }).then((a) {
+          return getQuery(context).then((query) {
+            if (localServer == null || query == null || query.isEmpty) {
+              throw Exception('Unable to get url');
+            }
+            url.value =
+                'http://${localServer!.address.address}:${localServer!.port}#gsc.q=${Uri.encodeQueryComponent(query)}';
+          });
+        }).catchError((e) {
+          searchState.value = null;
+        });
+        return () {
+          localServer!.close();
+        };
+      },
+      [],
+    );
 
     final dx = useState<double>(searchState.value?.point2.dx ?? 0);
     final dy = useState<double>(searchState.value?.point2.dy ?? 0);
@@ -49,28 +62,44 @@ class Search extends HookWidget {
         child: url.value == null
             ? Container()
             : Draggable(
-                feedback: PopUpContent(url.value ?? 'https://google.com', () {
-                  searchState.value = null;
-                }),
-                childWhenDragging: Container(),
-                onDraggableCanceled: (Velocity velocity, Offset offset) {
-                  dx.value = offset.dx;
-                  dy.value = offset.dy;
-                },
-                child: PopUpContent(url.value ?? 'https://google.com', () {
-                  searchState.value = null;
-                }),
-              ));
+                  feedback: PopUpContent(url.value ?? 'https://google.com', () {
+                    searchState.value = null;
+                  }),
+                  childWhenDragging: Container(),
+                  onDraggableCanceled: (Velocity velocity, Offset offset) {
+                    dx.value = offset.dx;
+                    dy.value = offset.dy;
+                  },
+                  child: PopUpContent(url.value ?? 'https://google.com', () {
+                    searchState.value = null;
+                  }),
+                ));
   }
 
-  Future<String> getUrl(BuildContext context) async {
+  Future<HttpServer> startServer() async {
+    var server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8080);
+
+    Future.delayed(Duration(milliseconds: 1), () async {
+      await for (var request in server) {
+        request.response
+          ..headers.contentType = ContentType('text', 'html', charset: 'utf-8')
+          ..write(
+              '<html><head><meta name="viewport" content="width=device-width, initial-scale=1.0"><script async src="https://cse.google.com/cse.js?cx=5233e46533c0e467e"></script></head><body><div class="gcse-searchresults-only"></div></body></html>')
+          ..close();
+      }
+    });
+    print('Server running on IP : ${server.address} On Port : ${server.port}');
+    return server;
+  }
+
+  Future<String?> getQuery(BuildContext context) async {
     // try with digital ink
     String? searchText = await getFromDigitalInk(context);
     if (searchText!.isEmpty) {
       searchText = await getFromImage();
     }
 
-    return 'https://www.google.com/search?safe=true&q=${Uri.encodeComponent(searchText ?? "")}';
+    return searchText;
   }
 
   Future<String?> getFromImage() async {
@@ -158,7 +187,7 @@ class Search extends HookWidget {
           Rect.fromPoints(searchState.value!.point1, searchState.value!.point2);
 
       for (final sketch in searchState.value!.allSketches) {
-        if(sketch.type != SketchType.scribble){
+        if (sketch.type != SketchType.scribble) {
           continue;
         }
         final Stroke stroke = Stroke();
@@ -248,7 +277,7 @@ class PopUpContent extends HookWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Google'),
+              const Text('Search'),
               IconButton(onPressed: onClose, icon: const Icon(Icons.close))
             ],
           ),
