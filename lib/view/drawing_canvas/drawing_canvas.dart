@@ -2,7 +2,6 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart' hide Image;
-import 'package:flutter/rendering.dart';
 import 'package:flutter_drawing_board/main.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/drawing_mode.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/sketch.dart';
@@ -23,7 +22,7 @@ class DrawingCanvas extends HookWidget {
   final GlobalKey canvasGlobalKey;
   final ValueNotifier<int> polygonSides;
   final ValueNotifier<bool> filled;
-  final ValueNotifier<SearchState?> popUp;
+  final ValueNotifier<SearchState?> search;
 
   final GlobalKey _globalKey = GlobalKey();
 
@@ -42,7 +41,7 @@ class DrawingCanvas extends HookWidget {
     required this.filled,
     required this.polygonSides,
     required this.backgroundImage,
-    required this.popUp
+    required this.search
   }) : super(key: key);
 
   @override
@@ -89,7 +88,7 @@ class DrawingCanvas extends HookWidget {
       ..add(currentTimeInMillis);
 
     if(drawingMode.value == DrawingMode.search){
-      popUp.value = null;
+      search.value = null;
     }
     
     if(![DrawingMode.eraser, DrawingMode.pencil].contains(drawingMode.value) && points.length > 1){
@@ -197,7 +196,7 @@ class DrawingCanvas extends HookWidget {
       copyOfAllSketches.add(Sketch.fromJson(sketch.toJson()));
     }
 
-    popUp.value = SearchState(firstPoint,lastPoint, copyOfAllSketches);
+    search.value = SearchState(firstPoint,lastPoint, copyOfAllSketches);
   }
 }
 

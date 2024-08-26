@@ -86,24 +86,10 @@ class Search extends HookWidget {
                       ),
                     ),
                   ),
-                  PopUpContent(url: url.value ?? 'https://google.com'),
+                  SearchContent(url: url.value ?? 'https://google.com'),
                 ],
               )
 
-        /*
-            Draggable(
-                  feedback: PopUpContent(url.value ?? 'https://google.com', () {
-                    searchState.value = null;
-                  }),
-                  childWhenDragging: Container(),
-                  onDraggableCanceled: (Velocity velocity, Offset offset) {
-                    dx.value = offset.dx;
-                    dy.value = offset.dy;
-                  },
-                  child: PopUpContent(url.value ?? 'https://google.com', () {
-                    searchState.value = null;
-                  }),
-                )*/
         );
   }
 
@@ -260,16 +246,16 @@ class Search extends HookWidget {
   }
 }
 
-class PopUpContent extends StatefulWidget {
+class SearchContent extends StatefulWidget {
   final String url;
 
-  const PopUpContent({required this.url, super.key});
+  const SearchContent({required this.url, super.key});
  
   @override
-  State<PopUpContent> createState() => _PopUpContent();
+  State<SearchContent> createState() => _SearchContent();
 }
 
-class _PopUpContent extends State<PopUpContent> {
+class _SearchContent extends State<SearchContent> {
   late final WebViewController controller;
 
   @override

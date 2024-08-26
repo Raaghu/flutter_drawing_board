@@ -13,10 +13,20 @@ class ColorPalette extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    final internalSelectedColor = useState(selectedColor.value);
+    useEffect((){
+      Future.delayed(const Duration(milliseconds: 1)).then((value) {
+       selectedColor.value = internalSelectedColor.value;
+      });
+      return null;
+    }, [
+      internalSelectedColor.value,
+    ]);
     List<Color> colors = [
       Colors.black,
       Colors.white,
       ...Colors.primaries,
+      Colors.grey,
     ];
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -32,16 +42,16 @@ class ColorPalette extends HookWidget {
               MouseRegion(
                 cursor: SystemMouseCursors.click,
                 child: GestureDetector(
-                  onTap: () => selectedColor.value = color,
+                  onTap: () => internalSelectedColor.value = color,
                   child: Container(
                     height: 25,
                     width: 25,
                     decoration: BoxDecoration(
                       color: color,
                       border: Border.all(
-                        color: selectedColor.value == color
+                        color: internalSelectedColor.value == color
                             ? Colors.blue
-                            : Colors.grey,
+                            : Colors.transparent,
                         width: 1.5,
                       ),
                       borderRadius: const BorderRadius.all(Radius.circular(5)),
@@ -59,7 +69,7 @@ class ColorPalette extends HookWidget {
               height: 30,
               width: 30,
               decoration: BoxDecoration(
-                color: selectedColor.value,
+                color: internalSelectedColor.value,
                 border: Border.all(color: Colors.blue, width: 1.5),
                 borderRadius: const BorderRadius.all(Radius.circular(5)),
               ),
@@ -69,7 +79,7 @@ class ColorPalette extends HookWidget {
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
                 onTap: () {
-                  showColorWheel(context, selectedColor);
+                  showColorWheel(context, internalSelectedColor);
                 },
                 child: SvgPicture.asset(
                   'assets/svgs/color_wheel.svg',

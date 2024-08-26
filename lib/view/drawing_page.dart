@@ -7,7 +7,7 @@ import 'package:flutter_drawing_board/view/drawing_canvas/drawing_canvas.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/drawing_mode.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/sketch.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/widgets/canvas_bottom_bar.dart';
-import 'package:flutter_drawing_board/view/drawing_canvas/widgets/canvas_side_bar.dart';
+import 'package:flutter_drawing_board/view/drawing_canvas/widgets/menu_popup.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/widgets/search.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -23,7 +23,8 @@ class DrawingPage extends HookWidget {
     final filled = useState<bool>(false);
     final polygonSides = useState<int>(3);
     final backgroundImage = useState<Image?>(null);
-    final popUp = useState<SearchState?>(null);
+    final search = useState<SearchState?>(null);
+    final popupMenu = useState<PopupMenuState?>(null);
 
     final canvasGlobalKey = GlobalKey();
 
@@ -42,64 +43,42 @@ class DrawingPage extends HookWidget {
             width: double.maxFinite,
             height: double.maxFinite,
             child: DrawingCanvas(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              drawingMode: drawingMode,
-              selectedColor: selectedColor,
-              strokeSize: strokeSize,
-              eraserSize: eraserSize,
-              sideBarController: animationController,
-              currentSketch: currentSketch,
-              allSketches: allSketches,
-              canvasGlobalKey: canvasGlobalKey,
-              filled: filled,
-              polygonSides: polygonSides,
-              backgroundImage: backgroundImage,
-              popUp: popUp
-            ),
-          ),
-          Positioned(
-            top: kToolbarHeight + 10,
-            // left: -5,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(-1, 0),
-                end: Offset.zero,
-              ).animate(animationController),
-              child: CanvasSideBar(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
                 drawingMode: drawingMode,
                 selectedColor: selectedColor,
                 strokeSize: strokeSize,
                 eraserSize: eraserSize,
+                sideBarController: animationController,
                 currentSketch: currentSketch,
                 allSketches: allSketches,
                 canvasGlobalKey: canvasGlobalKey,
                 filled: filled,
                 polygonSides: polygonSides,
                 backgroundImage: backgroundImage,
-              ),
-            ),
+                search: search),
           ),
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
             // left: -5,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 1),
-                end: Offset.zero,
-              ).animate(animationController),
-              child: Center(
-                child: CanvasBottomBar(
-                  drawingMode: drawingMode,
-                ),
+            child: Center(
+              child: CanvasBottomBar(
+                drawingMode: drawingMode,
+                popupMenu: popupMenu,
+                allSketches: allSketches,
+                currentSketch: currentSketch,
+                selectedColor: selectedColor,
+                eraserSize: eraserSize,
+                strokeSize: strokeSize,
+                polygonSides: polygonSides,
               ),
             ),
           ),
           _CustomAppBar(animationController: animationController),
-          if(popUp.value != null)
-            Search(popUp, canvasGlobalKey)
+          if (search.value != null) Search(search, canvasGlobalKey),
+          if (popupMenu.value != null) PopupMenu(popupMenu),
         ],
       ),
     );
@@ -114,7 +93,7 @@ class _CustomAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
       height: kToolbarHeight,
       width: double.maxFinite,
       child: Padding(
@@ -122,19 +101,18 @@ class _CustomAppBar extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            IconButton(
-              onPressed: () {
-                if (animationController.value == 0) {
-                  animationController.forward();
-                } else {
-                  animationController.reverse();
-                }
-              },
-              icon: const Icon(Icons.menu),
+            SizedBox(
+              width: 40,
+              height: 40,
             ),
-            const widgets.Image(
-                image: AssetImage('assets/logic.png'),height: 20,),
-            const SizedBox(width: 40,height: 40,),
+            widgets.Image(
+              image: AssetImage('assets/logic.png'),
+              height: 20,
+            ),
+            SizedBox(
+              width: 40,
+              height: 40,
+            ),
           ],
         ),
       ),

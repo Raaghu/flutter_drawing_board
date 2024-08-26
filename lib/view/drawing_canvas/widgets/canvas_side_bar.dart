@@ -117,14 +117,6 @@ class CanvasSideBar extends HookWidget {
                   : const SizedBox.shrink(),
             ),
             const SizedBox(height: 10),
-            const Text(
-              'Colors',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const Divider(),
-            ColorPalette(
-              selectedColor: selectedColor,
-            ),
             const SizedBox(height: 20),
             const Text(
               'Size',
