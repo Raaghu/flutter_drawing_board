@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart' hide Image;
 import 'package:flutter_drawing_board/view/drawing_canvas/models/drawing_mode.dart';
+import 'package:flutter_drawing_board/view/drawing_canvas/models/ruler_type.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/sketch.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/widgets/color_palette.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/widgets/menu_popup.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CanvasBottomBar extends HookWidget {
@@ -15,6 +17,8 @@ class CanvasBottomBar extends HookWidget {
   final ValueNotifier<double> eraserSize;
   final ValueNotifier<double> strokeSize;
   final ValueNotifier<int> polygonSides;
+  final ValueNotifier<RulerType?> rulerType;
+
 
   const CanvasBottomBar({
     Key? key,
@@ -26,6 +30,7 @@ class CanvasBottomBar extends HookWidget {
     required this.eraserSize,
     required this.strokeSize,
     required this.polygonSides,
+    required this.rulerType,
   }) : super(key: key);
 
   @override
@@ -176,15 +181,8 @@ class CanvasBottomBar extends HookWidget {
               iconData: FontAwesomeIcons.ruler,
               selected: false,
               onTap: (context) {
-                if (popupMenu.value == null) {
-                  RenderBox box = context.findRenderObject() as RenderBox;
-                  Offset position = box.localToGlobal(Offset.zero);
-                  popupMenu.value = PopupMenuState(
-                      position.translate(box.size.width / 2, 0),
-                      const Text('TODO:'));
-                } else {
-                  popupMenu.value = null;
-                }
+                togglePopupMenu(context, RulerChooser(rulerType),
+                    width: 110, height: 110);
               },
               tooltip: 'Ruler',
             ),
@@ -421,6 +419,65 @@ class PolygonSidesSlider extends HookWidget {
       },
       label: '${internalPolygonSides.value}',
       divisions: 5,
+    );
+  }
+}
+
+class RulerChooser extends HookWidget {
+  final ValueNotifier<RulerType?> rulerType;
+
+  const RulerChooser(this.rulerType, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            IconButton(
+              onPressed: () {
+                rulerType.value = RulerType.ruler;
+              },
+              icon: SvgPicture.asset(
+                'assets/svgs/ruler_ruler.svg',
+                width: 30,
+                height: 30,
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                rulerType.value = RulerType.triangle;
+              },
+              icon: SvgPicture.asset(
+                'assets/svgs/ruler_triangle.svg',
+                width: 26,
+                height: 26,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            IconButton(
+              onPressed: () {
+                rulerType.value = RulerType.protractor;
+              },
+              icon: SvgPicture.asset(
+                'assets/svgs/ruler_protractor.svg',
+                width: 30,
+                height: 30,
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                rulerType.value = null;
+              },
+              color: const Color.fromARGB(255, 226, 68, 68),
+              icon: const Icon(Icons.clear),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

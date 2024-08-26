@@ -5,9 +5,11 @@ import 'package:flutter/widgets.dart' as widgets;
 import 'package:flutter_drawing_board/main.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/drawing_canvas.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/drawing_mode.dart';
+import 'package:flutter_drawing_board/view/drawing_canvas/models/ruler_type.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/models/sketch.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/widgets/canvas_bottom_bar.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/widgets/menu_popup.dart';
+import 'package:flutter_drawing_board/view/drawing_canvas/widgets/ruler.dart';
 import 'package:flutter_drawing_board/view/drawing_canvas/widgets/search.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -25,6 +27,7 @@ class DrawingPage extends HookWidget {
     final backgroundImage = useState<Image?>(null);
     final search = useState<SearchState?>(null);
     final popupMenu = useState<PopupMenuState?>(null);
+    final rulerType = useState<RulerType?>(null);
 
     final canvasGlobalKey = GlobalKey();
 
@@ -73,12 +76,14 @@ class DrawingPage extends HookWidget {
                 eraserSize: eraserSize,
                 strokeSize: strokeSize,
                 polygonSides: polygonSides,
+                rulerType: rulerType,
               ),
             ),
           ),
           _CustomAppBar(animationController: animationController),
           if (search.value != null) Search(search, canvasGlobalKey),
           if (popupMenu.value != null) PopupMenu(popupMenu),
+          if (rulerType.value != null) Ruler(rulerType),
         ],
       ),
     );

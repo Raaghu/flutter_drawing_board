@@ -34,7 +34,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_colorpicker: ^1.0.3
   flutter_hooks: ^0.18.5+1
-  flutter_svg: ^2.0.9
+  flutter_svg: ^2.0.10+1
   file_saver: ^0.2.9
   font_awesome_flutter: ^10.6.0
   url_launcher: ^6.2.1
@@ -71,6 +71,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/pngs/
     - assets/svgs/
     - assets/logic.png
   #   - images/a_dot_ham.jpeg
